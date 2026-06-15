@@ -1,27 +1,33 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { db } from "../lib/firebase";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
+
 export default function Home() {
-  const jobs = [
-    {
-      title: "Karnataka Police Constable",
-      company: "Karnataka State Police",
-      location: "Karnataka",
-      type: "Government Job",
-      apply: "#",
-    },
-    {
-      title: "Data Entry Operator",
-      company: "Private Company",
-      location: "Bengaluru",
-      type: "Private Job",
-      apply: "#",
-    },
-    {
-      title: "Customer Support Executive",
-      company: "Infosys",
-      location: "Mysuru",
-      type: "Private Job",
-      apply: "#",
-    },
-  ];
+  const [jobs, setJobs] = useState([]);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("All");
+
+useEffect(() => {
+  const fetchJobs = async () => {
+    const q = query(
+  collection(db, "jobs"),
+  orderBy("createdAt", "desc")
+);
+
+const querySnapshot = await getDocs(q);
+
+    const jobList = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    setJobs(jobList);
+  };
+
+  fetchJobs();
+}, []);
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -66,27 +72,84 @@ export default function Home() {
       </section>
 
       {/* Search */}
-      <section className="max-w-6xl mx-auto px-6 mt-8">
-        <input
-          type="text"
-          placeholder="Search jobs by title, company, or location"
-          className="w-full border rounded-xl px-4 py-3"
-        />
-      </section>
+<section className="max-w-6xl mx-auto px-6 mt-8">
+  <input
+    type="text"
+    placeholder="Search jobs by title, company, or location"
+    className="w-full border rounded-xl px-4 py-3"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+  />
+
+  <div className="flex gap-3 mt-4">
+    <button
+      onClick={() => setFilter("All")}
+      className="bg-gray-700 text-white px-4 py-2 rounded"
+    >
+      All Jobs
+    </button>
+
+    <button
+      onClick={() => setFilter("Government")}
+      className="bg-blue-700 text-white px-4 py-2 rounded"
+    >
+      Government Jobs
+    </button>
+
+    <button
+      onClick={() => setFilter("Private")}
+      className="bg-green-700 text-white px-4 py-2 rounded"
+    >
+      Private Jobs
+    </button>
+  </div>
+</section>
 
       {/* Job Listings */}
       <section className="max-w-6xl mx-auto px-6 py-8">
         <h2 className="text-2xl font-bold mb-6">Latest Job Notifications</h2>
 
         <div className="grid gap-6">
-          {jobs.map((job, index) => (
+          {jobs
+  .filter((job) => {
+    const matchesSearch =
+      job.title?.toLowerCase().includes(search.toLowerCase()) ||
+      job.company?.toLowerCase().includes(search.toLowerCase()) ||
+      job.location?.toLowerCase().includes(search.toLowerCase());
+
+    const matchesFilter =
+      filter === "All" ||
+      job.type?.toLowerCase().includes(filter.toLowerCase());
+
+    return matchesSearch && matchesFilter;
+  })
+  .map((job) => (
             <div
-              key={index}
+              key={job.id}
               className="bg-white rounded-2xl shadow-md p-6 border"
             >
-              <h3 className="text-xl font-semibold">{job.title}</h3>
+              <a href={`/jobs/${job.id}`}>
+  <h3 className="text-xl font-semibold text-blue-700 hover:underline">
+    {job.title}
+  </h3>
+</a>
               <p className="text-gray-700 mt-1">{job.company}</p>
               <p className="text-gray-500 mt-1">{job.location}</p>
+              <p className="text-gray-500 mt-1">
+  Type: {job.type}
+</p>
+
+<p className="text-red-600 mt-1">
+  Last Date: {job.lastDate}
+</p>
+{new Date(job.lastDate) < new Date() && (
+  <div className="mt-2 inline-block bg-red-600 text-white px-3 py-1 rounded">
+    Expired
+  </div>
+)}
+<p className="text-gray-700 mt-3 whitespace-pre-line">
+  {job.description}
+</p>
 
               <span className="inline-block mt-3 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
                 {job.type}
@@ -94,11 +157,13 @@ export default function Home() {
 
               <div className="mt-4">
                 <a
-                  href={job.apply}
-                  className="inline-block bg-blue-700 text-white px-5 py-2 rounded-lg"
-                >
-                  Apply Now
-                </a>
+  href={job.apply}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-block bg-blue-700 text-white px-5 py-2 rounded-lg"
+>
+  Apply Now
+</a>
               </div>
             </div>
           ))}
