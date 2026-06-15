@@ -25,6 +25,10 @@ export const metadata = {
     "Village Accountant Recruitment",
   ],
 
+  verification: {
+    google: "Efs6n3SBFOVnyb1rExFxzeh6imNmo9V9Onmi6qZcS2k",
+  },
+
   openGraph: {
     title: "Karnataka Jobs",
     description:
