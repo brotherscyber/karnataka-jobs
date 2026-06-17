@@ -6,4 +6,16 @@ export default function ContactPage() {
       </h1>
 
       <p className="text-gray-700 mb-4">
-       
+        For job-related queries or suggestions, contact us using the details below.
+      </p>
+
+      <p className="text-gray-700 mb-4">
+        Email: brotherscyber@gmail.com
+      </p>
+
+      <p className="text-gray-700">
+        WhatsApp: +91 7019402771
+      </p>
+    </main>
+  );
+}
