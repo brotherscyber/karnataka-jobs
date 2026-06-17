@@ -58,10 +58,34 @@ export default function JobDetails() {
       </main>
     );
   }
-
+const jobSchema = {
+  "@context": "https://schema.org",
+  "@type": "JobPosting",
+  title: job.title,
+  description: job.description,
+  hiringOrganization: {
+    "@type": "Organization",
+    name: job.company,
+  },
+  jobLocation: {
+    "@type": "Place",
+    address: {
+      "@type": "PostalAddress",
+      addressRegion: job.location,
+      addressCountry: "IN",
+    },
+  },
+  employmentType: job.type,
+  validThrough: job.lastDate,
+};
   return (
     <main className="max-w-4xl mx-auto p-8">
-
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify(jobSchema),
+  }}
+/>
       <h1 className="text-3xl font-bold">
         {job.title}
       </h1>

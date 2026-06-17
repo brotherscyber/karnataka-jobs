@@ -16,6 +16,8 @@ export const metadata = {
   description:
     "Daily Karnataka Government and Private Job Notifications.",
 
+  manifest: "/manifest.webmanifest",
+
   keywords: [
     "Karnataka Jobs",
     "Government Jobs Karnataka",
@@ -34,6 +36,10 @@ export const metadata = {
     description:
       "Daily Government & Private Job Notifications in Karnataka",
   },
+};
+
+export const viewport = {
+  themeColor: "#1d4ed8",
 };
 
 export default function RootLayout({ children }) {

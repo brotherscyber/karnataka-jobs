@@ -5,8 +5,22 @@ import { db } from "../lib/firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
 export default function Home() {
+  const [savedJobs, setSavedJobs] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [search, setSearch] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
+  const saveJob = (jobId) => {
+  let updated = [...savedJobs];
+
+  if (updated.includes(jobId)) {
+    updated = updated.filter((id) => id !== jobId);
+  } else {
+    updated.push(jobId);
+  }
+
+  setSavedJobs(updated);
+  localStorage.setItem("savedJobs", JSON.stringify(updated));
+};
   const [filter, setFilter] = useState("All");
 
 useEffect(() => {
@@ -27,23 +41,78 @@ const querySnapshot = await getDocs(q);
   };
 
   fetchJobs();
+  const saved = JSON.parse(localStorage.getItem("savedJobs")) || [];
+setSavedJobs(saved);
 }, []);
 
   return (
-    <main className="min-h-screen bg-gray-50">
+  <main
+    className={
+      darkMode
+        ? "min-h-screen bg-gray-900 text-white"
+        : "min-h-screen bg-gray-50"
+    }
+  >
       {/* Header */}
       <header className="bg-blue-700 text-white">
-        <div className="max-w-6xl mx-auto px-6 py-10">
-          <h1 className="text-4xl font-bold">Karnataka Jobs</h1>
-          <p className="mt-2 text-blue-100">
-            Daily Government & Private Job Notifications in Karnataka
-          </p>
-        </div>
+       <div className="max-w-6xl mx-auto px-6 py-10 flex justify-between items-center flex-wrap">
+
+  <div>
+    <h1 className="text-4xl font-bold">
+      Karnataka Jobs
+    </h1>
+
+    <p className="mt-2 text-blue-100">
+      Daily Government & Private Job Notifications in Karnataka
+    </p>
+  </div>
+
+  <div className="flex gap-3 flex-wrap mt-4 md:mt-0">
+
+    <a
+      href="/government-jobs"
+      className="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold"
+    >
+      🏛 Government Jobs
+    </a>
+
+    <a
+      href="/private-jobs"
+      className="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold"
+    >
+      🏢 Private Jobs
+    </a>
+
+    <a
+      href="/saved-jobs"
+      className="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold"
+    >
+      ❤️ Saved Jobs
+    </a>
+
+    <button
+      onClick={() => setDarkMode(!darkMode)}
+      className="bg-black text-white px-4 py-2 rounded-lg"
+    >
+      {darkMode ? "☀️ Light" : "🌙 Dark"}
+    </button>
+
+  </div>
+
+</div>
       </header>
 
       {/* Subscription Section */}
-      <section className="max-w-6xl mx-auto px-6 -mt-6">
-        <div className="bg-white rounded-2xl shadow-lg p-6">
+      <section
+  className={`max-w-6xl mx-auto px-6 -mt-6 ${
+    darkMode ? "text-white" : ""
+  }`}
+>
+        <div
+  className={`rounded-2xl shadow-lg p-6 ${
+    darkMode ? "bg-gray-800" : "bg-white"
+  }`}
+>
           <h2 className="text-2xl font-semibold">Get Daily Job Alerts</h2>
           <p className="text-gray-600 mt-2">
             Subscribe by email or join WhatsApp to receive the latest job
@@ -108,6 +177,35 @@ const querySnapshot = await getDocs(q);
       {/* Job Listings */}
       <section className="max-w-6xl mx-auto px-6 py-8">
         <h2 className="text-2xl font-bold mb-6">Latest Job Notifications</h2>
+        <div
+  className={`mb-8 border rounded-2xl p-6 ${
+    darkMode
+      ? "bg-gray-800 border-gray-700"
+      : "bg-yellow-50 border-yellow-300"
+  }`}
+>
+  <h2 className="text-2xl font-bold text-yellow-700 mb-4">
+    Featured Jobs
+  </h2>
+
+  {jobs.slice(0, 3).map((job) => (
+    <div
+      key={job.id}
+      className="mb-4 pb-4 border-b last:border-b-0"
+    >
+      <a
+        href={`/jobs/${job.id}`}
+        className="text-blue-700 font-bold hover:underline"
+      >
+        {job.title}
+      </a>
+
+      <p className="text-gray-600">
+        {job.company}
+      </p>
+    </div>
+  ))}
+</div>
 
         <div className="grid gap-6">
           {jobs
@@ -126,7 +224,11 @@ const querySnapshot = await getDocs(q);
   .map((job) => (
             <div
               key={job.id}
-              className="bg-white rounded-2xl shadow-md p-6 border"
+              className={`rounded-2xl shadow-md p-6 border ${
+  darkMode
+    ? "bg-gray-800 border-gray-700"
+    : "bg-white"
+}`}
             >
               <a href={`/jobs/${job.id}`}>
   <h3 className="text-xl font-semibold text-blue-700 hover:underline">
@@ -155,16 +257,27 @@ const querySnapshot = await getDocs(q);
                 {job.type}
               </span>
 
-              <div className="mt-4">
-                <a
-  href={job.apply}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-block bg-blue-700 text-white px-5 py-2 rounded-lg"
->
-  Apply Now
-</a>
-              </div>
+              <div className="mt-4 flex gap-3 flex-wrap">
+
+  <a
+    href={job.apply}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block bg-blue-700 text-white px-5 py-2 rounded-lg"
+  >
+    Apply Now
+  </a>
+
+  <button
+    onClick={() => saveJob(job.id)}
+    className="bg-gray-200 px-5 py-2 rounded-lg"
+  >
+    {savedJobs.includes(job.id)
+      ? "❤️ Saved"
+      : "🤍 Save Job"}
+  </button>
+
+</div>
             </div>
           ))}
         </div>
@@ -179,13 +292,47 @@ const querySnapshot = await getDocs(q);
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 mt-10">
-        <div className="max-w-6xl mx-auto px-6 py-8 text-center">
-          <p>© 2026 Karnataka Jobs. All rights reserved.</p>
-          <p className="mt-2 text-sm">
-            Daily job updates for Karnataka job seekers.
-          </p>
-        </div>
+       <div className="max-w-6xl mx-auto px-6 py-8 text-center">
+
+  <p>© 2026 Karnataka Jobs. All rights reserved.</p>
+
+  <p className="mt-2 text-sm">
+    Daily job updates for Karnataka job seekers.
+  </p>
+
+  <div className="mt-4 flex justify-center gap-6 flex-wrap">
+
+    <a href="/about" className="hover:text-white">
+      About Us
+    </a>
+
+    <a href="/contact" className="hover:text-white">
+      Contact Us
+    </a>
+
+    <a href="/privacy-policy" className="hover:text-white">
+      Privacy Policy
+    </a>
+
+    <a href="/disclaimer" className="hover:text-white">
+      Disclaimer
+    </a>
+
+  </div>
+
+</div>
       </footer>
+      <button
+  onClick={() =>
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    })
+  }
+  className="fixed bottom-6 right-6 bg-blue-700 text-white px-4 py-3 rounded-full shadow-lg"
+>
+  ⬆ Top
+</button>
     </main>
   );
 }
