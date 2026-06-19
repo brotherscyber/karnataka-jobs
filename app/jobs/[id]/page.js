@@ -8,6 +8,8 @@ import {
   getDoc,
   getDocs,
   collection,
+  updateDoc,
+  increment,
 } from "firebase/firestore";
 
 export default function JobDetails() {
@@ -22,10 +24,14 @@ export default function JobDetails() {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
+        await updateDoc(docRef, {
+  views: increment(1),
+});
         const currentJob = {
-          id: docSnap.id,
-          ...docSnap.data(),
-        };
+  id: docSnap.id,
+  ...docSnap.data(),
+  views: (docSnap.data().views || 0) + 1,
+};
 
         setJob(currentJob);
 
@@ -101,6 +107,9 @@ const jobSchema = {
       <p className="text-blue-700 mt-2">
         Type: {job.type}
       </p>
+      <p className="text-gray-600 mt-2">
+  👁 Views: {job.views || 0}
+</p>
 
       <p className="text-red-600 mt-2">
         Last Date: {job.lastDate}

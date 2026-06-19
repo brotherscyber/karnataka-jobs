@@ -29,6 +29,7 @@ useEffect(() => {
   const [location, setLocation] = useState("");
 
   const [type, setType] = useState("");
+  const [category, setCategory] = useState("");
   const [apply, setApply] = useState("");
   const [lastDate, setLastDate] = useState("");
   const [description, setDescription] = useState("");
@@ -75,6 +76,7 @@ const deleteJob = async (id) => {
         company,
         location,
         type,
+        category,
         apply,
         lastDate,
         description,
@@ -145,6 +147,12 @@ if (!authorized) {
 <input
   className="border p-3 w-full"
   placeholder="Job Type (Government / Private)"
+  <input
+  className="border p-3 w-full"
+  placeholder="Category (Banking, Railway, Police, Teaching, IT)"
+  value={category}
+  onChange={(e) => setCategory(e.target.value)}
+/>
   value={type}
   onChange={(e) => setType(e.target.value)}
 />
@@ -203,6 +211,7 @@ if (!authorized) {
       setCompany(job.company || "");
       setLocation(job.location || "");
       setType(job.type || "");
+      setCategory(job.category || "");
       setApply(job.apply || "");
       setLastDate(job.lastDate || "");
       setDescription(job.description || "");

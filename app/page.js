@@ -22,6 +22,7 @@ export default function Home() {
   localStorage.setItem("savedJobs", JSON.stringify(updated));
 };
   const [filter, setFilter] = useState("All");
+  const [categoryFilter, setCategoryFilter] = useState("All");
 
 useEffect(() => {
   const fetchJobs = async () => {
@@ -172,6 +173,51 @@ setSavedJobs(saved);
       Private Jobs
     </button>
   </div>
+  <div className="flex gap-3 mt-4 flex-wrap">
+
+  <button
+    onClick={() => setCategoryFilter("All")}
+    className="bg-gray-600 text-white px-4 py-2 rounded"
+  >
+    All Categories
+  </button>
+
+  <button
+    onClick={() => setCategoryFilter("Banking")}
+    className="bg-blue-600 text-white px-4 py-2 rounded"
+  >
+    🏦 Banking
+  </button>
+
+  <button
+    onClick={() => setCategoryFilter("Railway")}
+    className="bg-green-600 text-white px-4 py-2 rounded"
+  >
+    🚆 Railway
+  </button>
+
+  <button
+    onClick={() => setCategoryFilter("Police")}
+    className="bg-red-600 text-white px-4 py-2 rounded"
+  >
+    👮 Police
+  </button>
+
+  <button
+    onClick={() => setCategoryFilter("Teaching")}
+    className="bg-yellow-600 text-white px-4 py-2 rounded"
+  >
+    📚 Teaching
+  </button>
+
+  <button
+    onClick={() => setCategoryFilter("IT")}
+    className="bg-purple-600 text-white px-4 py-2 rounded"
+  >
+    💻 IT
+  </button>
+
+</div>
 </section>
 
       {/* Job Listings */}
@@ -219,7 +265,11 @@ setSavedJobs(saved);
       filter === "All" ||
       job.type?.toLowerCase().includes(filter.toLowerCase());
 
-    return matchesSearch && matchesFilter;
+    const matchesCategory =
+  categoryFilter === "All" ||
+  job.category?.toLowerCase() === categoryFilter.toLowerCase();
+
+return matchesSearch && matchesFilter && matchesCategory;
   })
   .map((job) => (
             <div
@@ -239,6 +289,9 @@ setSavedJobs(saved);
               <p className="text-gray-500 mt-1">{job.location}</p>
               <p className="text-gray-500 mt-1">
   Type: {job.type}
+</p>
+<p className="text-gray-500 mt-1">
+  Category: {job.category}
 </p>
 
 <p className="text-red-600 mt-1">
@@ -269,13 +322,36 @@ setSavedJobs(saved);
   </a>
 
   <button
-    onClick={() => saveJob(job.id)}
-    className="bg-gray-200 px-5 py-2 rounded-lg"
-  >
-    {savedJobs.includes(job.id)
-      ? "❤️ Saved"
-      : "🤍 Save Job"}
-  </button>
+  onClick={() => saveJob(job.id)}
+  className="bg-gray-200 px-5 py-2 rounded-lg"
+>
+  {savedJobs.includes(job.id)
+    ? "❤️ Saved"
+    : "🤍 Save Job"}
+</button>
+
+<a
+  href={`https://wa.me/?text=${encodeURIComponent(
+    `${job.title}\n\n${window.location.origin}/jobs/${job.id}`
+  )}`}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="bg-green-600 text-white px-5 py-2 rounded-lg"
+>
+  📤 Share WhatsApp
+</a>
+
+<button
+  onClick={() => {
+    navigator.clipboard.writeText(
+      `${window.location.origin}/jobs/${job.id}`
+    );
+    alert("Link copied!");
+  }}
+  className="bg-purple-600 text-white px-5 py-2 rounded-lg"
+>
+  🔗 Copy Link
+</button>
 
 </div>
             </div>
