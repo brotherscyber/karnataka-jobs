@@ -147,14 +147,15 @@ if (!authorized) {
 <input
   className="border p-3 w-full"
   placeholder="Job Type (Government / Private)"
-  <input
+  value={type}
+  onChange={(e) => setType(e.target.value)}
+/>
+
+<input
   className="border p-3 w-full"
   placeholder="Category (Banking, Railway, Police, Teaching, IT)"
   value={category}
   onChange={(e) => setCategory(e.target.value)}
-/>
-  value={type}
-  onChange={(e) => setType(e.target.value)}
 />
 
 <input
